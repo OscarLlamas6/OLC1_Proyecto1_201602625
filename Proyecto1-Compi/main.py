@@ -1,6 +1,12 @@
-from tkinter import *
+
 from tkinter.font import Font
 from tkinter import Tk, Text, Menu, messagebox, filedialog, ttk, Label, scrolledtext, INSERT, END, Button, Scrollbar, RIGHT, Y, Frame, Canvas, HORIZONTAL, VERTICAL, simpledialog, mainloop
+import pathlib
+import sys
+sys.path.append(".")
+from Analizadores.LexicoJS import *
+from Analizadores.LexicoCSS import *
+from Analizadores.LexicoHTML import *
 
 raiz=Tk()
 raiz.title("Compiladores 1")
@@ -15,13 +21,19 @@ myscrolls = []
 s = ttk.Style()
 s.configure('TNotebook.Tab', font=myFont2)
 archivo = ""
+lenguaje = ""
 
 def codigoBoton():
-    cadena = "Hola Mundo"
-    if myNotebook.select():
-        idx = myNotebook.index('current')
-        mytexts[idx].delete(1.0, END)
-        mytexts[idx].insert(INSERT, cadena)
+    if lenguaje.lower() == ".js":
+        a = LexicoJS("")
+        a.Iniciar()
+    elif lenguaje.lower() == ".css":
+        a = LexicoCSS("")
+        a.Iniciar()
+    elif lenguaje.lower() == ".html":
+        a = LexicoHTML("")
+        a.Iniciar()  
+      
 
 def Limpiar():
     if myNotebook.select():
@@ -64,11 +76,13 @@ def nuevo():
 
 def abrir():
     global archivo
+    global lenguaje
     idx = 0
     if myNotebook.select():
         idx = myNotebook.index('current')
-    archivo = filedialog.askopenfilename(title = "Abrir Archivo", filetypes = (("OLC1 files","*.olc1"),("all files","*.*")))
+    archivo = filedialog.askopenfilename(title = "Abrir Archivo", filetypes = (("JavaScript files","*.js"),("CSS files","*.css"),("HTML files","*.html")))
     if archivo != '':
+        lenguaje = pathlib.Path(archivo).suffix
         entrada = open(archivo, encoding="utf-8")
         content = entrada.read()
         mytexts[idx].delete(1.0, END)
@@ -97,7 +111,7 @@ def guardarComo():
     idx = 0
     if myNotebook.select():
         idx = myNotebook.index('current')
-    guardar = filedialog.asksaveasfilename(title = "Guardar Archivo", filetypes = (("OLC1 files","*.olc1"),("all files","*.*")))
+    guardar = filedialog.asksaveasfilename(title = "Guardar Archivo", filetypes = (("JavaScript files","*.js"),("CSS files","*.css"),("HTML files","*.html")))
     if guardar != '':
         fguardar = open(guardar, "w+", encoding="utf-8")
         fguardar.write(mytexts[idx].get(1.0, END))
@@ -155,9 +169,4 @@ for i in range(4):
 
 
 
-
-
-
-
-
-raiz=mainloop()
+mainloop()
