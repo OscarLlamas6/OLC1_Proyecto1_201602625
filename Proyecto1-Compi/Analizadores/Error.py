@@ -1,12 +1,12 @@
-class Token:
-    def __init__(self, numero, fila, columna, token, lexema, tipo):
+class Error:
+    def __init__(self, numero, fila, columna, error, tipo, descripcion):
         self.numero = numero
         self.fila = fila
         self.columna = columna
-        self.token = token
-        self.lexema = lexema
+        self.error = error 
         self.tipo = tipo
-
+        self.descripcion = descripcion
+    
     def getNumero(self):
         return self.numero
     
@@ -15,12 +15,12 @@ class Token:
 
     def getColumna(self):
         return self.columna
+
+    def getError(self):
+        return self.error
     
-    def getToken(self):
-        return self.token
-    
-    def getLexema(self):
-        return self.lexema
+    def getDescripcion(self):
+        return self.descripcion
     
     def getTipo(self):
         return self.tipo

@@ -23,15 +23,18 @@ s.configure('TNotebook.Tab', font=myFont2)
 archivo = ""
 lenguaje = ""
 
-def codigoBoton():
+def Analizar():
+    idx = 0
+    if myNotebook.select():
+        idx = myNotebook.index('current')
     if lenguaje.lower() == ".js":
-        a = LexicoJS("")
+        a = LexicoJS(mytexts[idx].get("1.0",'end-2c'))
         a.Iniciar()
     elif lenguaje.lower() == ".css":
-        a = LexicoCSS("")
+        a = LexicoCSS(mytexts[idx].get("1.0",'end-2c'))
         a.Iniciar()
     elif lenguaje.lower() == ".html":
-        a = LexicoHTML("")
+        a = LexicoHTML(mytexts[idx].get("1.0",'end-2c'))
         a.Iniciar()  
       
 
@@ -133,7 +136,7 @@ archivoMenu.add_command(label="Salir", command = salir)
 barraMenu.add_cascade(label="Archivo", menu=archivoMenu)
 
 archivoMenu2 = Menu(barraMenu, tearoff=0)
-archivoMenu2.add_command(label="Analizar entrada", command = codigoBoton)
+archivoMenu2.add_command(label="Analizar entrada", command = Analizar)
 archivoMenu2.add_command(label="Limpiar pantalla", command = Limpiar)
 barraMenu.add_cascade(label="Acción", menu=archivoMenu2)
 
