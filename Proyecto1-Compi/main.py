@@ -2,11 +2,12 @@
 from tkinter.font import Font
 from tkinter import Tk, Text, Menu, messagebox, filedialog, ttk, Label, scrolledtext, INSERT, END, Button, Scrollbar, RIGHT, Y, Frame, Canvas, HORIZONTAL, VERTICAL, simpledialog, mainloop
 import pathlib
-import sys
-sys.path.append(".")
-from Analizadores.LexicoJS import *
-from Analizadores.LexicoCSS import *
-from Analizadores.LexicoHTML import *
+import LexicoCSS
+import LexicoJS
+import LexicoHTML
+from LexicoJS import *
+from LexicoCSS import *
+from LexicoHTML import *
 
 raiz=Tk()
 raiz.title("Compiladores 1")
@@ -28,13 +29,13 @@ def Analizar():
     if myNotebook.select():
         idx = myNotebook.index('current')
     if lenguaje.lower() == ".js":
-        a = LexicoJS(mytexts[idx].get("1.0",'end-2c'))
+        a = LexicoJS(mytexts[idx].get("1.0",'end-1c'))
         a.Iniciar()
     elif lenguaje.lower() == ".css":
-        a = LexicoCSS(mytexts[idx].get("1.0",'end-2c'))
+        a = LexicoCSS(mytexts[idx].get("1.0",'end-1c'))
         a.Iniciar()
     elif lenguaje.lower() == ".html":
-        a = LexicoHTML(mytexts[idx].get("1.0",'end-2c'))
+        a = LexicoHTML(mytexts[idx].get("1.0",'end-1c'))
         a.Iniciar()  
       
 
