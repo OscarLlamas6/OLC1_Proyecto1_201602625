@@ -24,6 +24,58 @@ s.configure('TNotebook.Tab', font=myFont2)
 archivo = ""
 lenguaje = ""
 
+
+
+
+def PintarReservadas(reservadas):
+    idt = 0
+    if myNotebook.select():
+        idt = myNotebook.index('current')
+    mytexts[idt].tag_remove('found1', '1.0', END)
+    for word in reservadas:
+        idx = '1.0'
+        while idx:
+            idx = mytexts[idt].search(word, idx, nocase=1, stopindex=END)
+            if idx:
+                lastidx = '%s+%dc' % (idx, len(word))
+                mytexts[idt].tag_add('found1', idx, lastidx)
+                idx = lastidx
+
+    mytexts[idt].tag_config('found1', foreground='red')
+
+def PintarCadenas(cadenas):
+    idt = 0
+    if myNotebook.select():
+        idt = myNotebook.index('current')
+    mytexts[idt].tag_remove('found', '1.0', END)
+    for word in cadenas:
+        idx = '1.0'
+        while idx:
+            idx = mytexts[idt].search(word, idx, nocase=1, stopindex=END)
+            if idx:
+                lastidx = '%s+%dc' % (idx, len(word))
+                mytexts[idt].tag_add('found', idx, lastidx)
+                idx = lastidx
+
+    mytexts[idt].tag_config('found', foreground='yellow')
+
+def PintarComentarios(comentarios):
+    idt = 0
+    if myNotebook.select():
+        idt = myNotebook.index('current')
+    mytexts[idt].tag_remove('found2', '1.0', END)
+    for word in comentarios:
+        idx = '1.0'
+        while idx:
+            idx = mytexts[idt].search(word, idx, nocase=1, stopindex=END)
+            if idx:
+                lastidx = '%s+%dc' % (idx, len(word))
+                mytexts[idt].tag_add('found2', idx, lastidx)
+                idx = lastidx
+
+    mytexts[idt].tag_config('found2', foreground='gray40')
+
+
 def Analizar():
     idx = 0
     if myNotebook.select():
@@ -31,6 +83,13 @@ def Analizar():
     if lenguaje.lower() == ".js":
         a = LexicoJS(mytexts[idx].get("1.0",'end-1c'))
         a.Iniciar()
+        if a.errorLex:
+            print("Error lexico encontrado")            
+        else:
+            PintarReservadas(a.Reservadas)
+            PintarCadenas(a.Cadenas)
+            PintarComentarios(a.Comentarios)
+
     elif lenguaje.lower() == ".css":
         a = LexicoCSS(mytexts[idx].get("1.0",'end-1c'))
         a.Iniciar()
@@ -170,6 +229,8 @@ for i in range(4):
     myscrolls[i].pack(side=RIGHT, fill=Y)
     myscrolls[i].place(in_=mytexts[i], relx=1, rely=0, relheight=1, anchor='ne', border="outside")
     mytexts[i].configure(yscrollcommand=myscrolls[i].set)
+
+
 
 
 

@@ -6,6 +6,8 @@ from Error import *
 
 
 
+
+
 class LexicoJS:
     def __init__(self, entrada):
         self.entrada = entrada
@@ -23,6 +25,7 @@ class LexicoJS:
         self.Reservadas = []
         self.Cadenas = []
         self.Operadores = []
+        self.Comentarios = []
 
     def Iniciar(self):
         print("Analizador JavaScript!")
@@ -106,20 +109,10 @@ class LexicoJS:
                         self.cTokens+=1
                         self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_AMPERSAND",self.lexemaact,"Simbolo"))
                         self.lexemaact = ""
-                    elif c == "\"":
-                        self.lexemaact+=c
-                        self.cTokens+=1
-                        self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_COMILLAS",self.lexemaact,"Simbolo"))
-                        self.lexemaact = ""
                     elif c == "|":
                         self.lexemaact+=c
                         self.cTokens+=1
                         self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_PLECA",self.lexemaact,"Simbolo"))
-                        self.lexemaact = ""
-                    elif c == "\'":
-                        self.lexemaact+=c
-                        self.cTokens+=1
-                        self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_COMILLA",self.lexemaact,"Simbolo"))
                         self.lexemaact = ""
                     elif c.isalpha(): #letra
                         self.estado = 1
@@ -132,6 +125,12 @@ class LexicoJS:
                         self.lexemaact = c
                     elif c == "/": # \ comentarios o simbolo slash
                         self.estado = 6
+                        self.lexemaact = c
+                    elif c == "\"": # \ cadenas
+                        self.estado = 10
+                        self.lexemaact = c
+                    elif c == "'": # \ cadenas y char
+                        self.estado = 11
                         self.lexemaact = c
                     else:
                         self.lexemaact = c
@@ -146,78 +145,97 @@ class LexicoJS:
                     else:
                         if self.lexemaact == "var":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_VAR",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "if":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_IF",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "else":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_ELSE",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "for":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_FOR",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "while":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_WHILE",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "do":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_DO",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "continue":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_CONTINUE",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "return":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_RETURN",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "false":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_FALSE",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "function":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_FUNCTION",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "constructor":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_CONSTRUCTOR",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "class":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_CLASS",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "this":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_THIS",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "Math":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_MATH",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "pow":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_POW",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "true":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_TRUE",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "PATHL":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_PATHL",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "PATHW":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_PATHW",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "break":
                             self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_BREAK",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         else:
@@ -302,6 +320,7 @@ class LexicoJS:
                         self.lexemaact += c
                     else:                       
                         self.cTokens+=1
+                        self.Comentarios.append(self.lexemaact)
                         self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_COMENTARIO_UNILINEA",self.lexemaact,"Comentario"))
                         self.col = 0
                         self.fila+=1
@@ -324,14 +343,35 @@ class LexicoJS:
                     else:
                         self.lexemaact += c
                         self.cTokens+=1
+                        self.Comentarios.append(self.lexemaact)
                         self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_COMENTARIO_MULTILINEA",self.lexemaact,"Comentario"))
                         self.lexemaact = ""
                         self.estado = 0
+                elif self.estado == 10:
+                    if c != "\"":
+                        self.estado = 10
+                        self.lexemaact += c
+                    else:
+                        self.lexemaact += c
+                        self.cTokens+=1
+                        self.Cadenas.append(self.lexemaact)
+                        self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_CADENA",self.lexemaact,"Cadena"))
+                        self.lexemaact = ""
+                        self.estado = 0
+                elif self.estado == 11:
+                    if c != "'":
+                        self.estado = 11
+                        self.lexemaact += c
+                    else:
+                        self.lexemaact += c
+                        self.cTokens+=1
+                        self.Cadenas.append(self.lexemaact)
+                        self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_CADENA",self.lexemaact,"Cadena"))
+                        self.lexemaact = ""
+                        self.estado = 0
                     
-        if self.errorLex:
-            print("Error lexico encontrado")
-        else:
-            print("Analisis lexico exitoso")            
+                    
+                 
                 
                 
 
