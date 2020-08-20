@@ -36,6 +36,35 @@ def GenerarSalida(Tokens, path):
         f.write(t.lexema)
     f.close()
 
+def GenerarPDFErrores(Errores):
+    f= open("C:\Salida\Errores.html","w+")
+    f.write("""<!DOCTYPE html>
+<html>
+<body>
+<h1>REPORTE DE ERRORES</h1>
+
+<table style="width:100%" border=1>
+ <tr>
+    <th>No.</th>
+    <th>Fila</th> 
+    <th>Columna</th>
+    <th>Descripción</th>
+  </tr>""")
+    for e in Errores:
+        f.write(""" <tr>
+    <th>{}</th>
+    <th>{}</th> 
+    <th>{}</th>
+    <th>El caracter '{}' no pertence al lenguaje</th>
+  </tr>""".format(e.numero,e.fila,e.columna,e.error))
+    f.write("""</table>
+    
+</body>
+</html>
+""")      
+    f.close()
+
+
 def PintarReservadas(reservadas):
     idt = 0
     if myNotebook.select():
@@ -114,7 +143,8 @@ def Analizar():
         PintarComentarios(a.Comentarios)
         PintarOperadores(a.Operadores)
         if a.errorLex:
-            print("Error lexico encontrado")     
+            print("Error lexico encontrado")   
+            GenerarPDFErrores(a.Errores)  
             #generarpdf de errores   
         else:
             print("Analisis lexico exitoso")

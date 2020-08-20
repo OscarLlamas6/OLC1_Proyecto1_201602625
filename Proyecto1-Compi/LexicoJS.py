@@ -35,9 +35,10 @@ class LexicoJS:
         print("Analizador JavaScript!")
         self.Tokens[:]=[]
         self.errorLex = False
-        self.entrada += " \n"        
+        self.entrada += " \n"   
+        self.fila+=2     
         for c in self.entrada: # iteramos en cada caracter           
-            self.col+=1
+            self.col+=1        
             self.anular = False
             self.repetir = True
             while self.repetir:
