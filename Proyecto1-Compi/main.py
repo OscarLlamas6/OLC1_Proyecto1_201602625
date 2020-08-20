@@ -5,6 +5,7 @@ import pathlib
 import LexicoCSS
 import LexicoJS
 import LexicoHTML
+import os
 from LexicoJS import *
 from LexicoCSS import *
 from LexicoHTML import *
@@ -26,6 +27,14 @@ lenguaje = ""
 
 
 
+def GenerarSalida(Tokens, path):
+    global archivo
+    name = os.path.basename(archivo)
+    path+=name
+    f= open(path,"w+")
+    for t in Tokens:
+        f.write(t.lexema)
+    f.close()
 
 def PintarReservadas(reservadas):
     idt = 0
@@ -76,19 +85,40 @@ def PintarComentarios(comentarios):
     mytexts[idt].tag_config('found2', foreground='gray40')
 
 
+def PintarOperadores(Operadores):
+    idt = 0
+    if myNotebook.select():
+        idt = myNotebook.index('current')
+    mytexts[idt].tag_remove('found3', '1.0', END)
+    for word in Operadores:
+        idx = '1.0'
+        while idx:
+            idx = mytexts[idt].search(word, idx, nocase=1, stopindex=END)
+            if idx:
+                lastidx = '%s+%dc' % (idx, len(word))
+                mytexts[idt].tag_add('found3', idx, lastidx)
+                idx = lastidx
+
+    mytexts[idt].tag_config('found3', foreground='orange')
+
 def Analizar():
     idx = 0
     if myNotebook.select():
         idx = myNotebook.index('current')
     if lenguaje.lower() == ".js":
-        a = LexicoJS(mytexts[idx].get("1.0",'end-1c'))
+        a = LexicoJS(mytexts[idx].get("2.0",'end-1c'), mytexts[idx].get('1.0', '1.0 lineend'))
         a.Iniciar()
+        GenerarSalida(a.Tokens, a.PathLine)
+        PintarReservadas(a.Reservadas)
+        PintarCadenas(a.Cadenas)
+        PintarComentarios(a.Comentarios)
+        PintarOperadores(a.Operadores)
         if a.errorLex:
-            print("Error lexico encontrado")            
+            print("Error lexico encontrado")     
+            #generarpdf de errores   
         else:
-            PintarReservadas(a.Reservadas)
-            PintarCadenas(a.Cadenas)
-            PintarComentarios(a.Comentarios)
+            print("Analisis lexico exitoso")
+            #generar arbol
 
     elif lenguaje.lower() == ".css":
         a = LexicoCSS(mytexts[idx].get("1.0",'end-1c'))
@@ -97,6 +127,8 @@ def Analizar():
         a = LexicoHTML(mytexts[idx].get("1.0",'end-1c'))
         a.Iniciar()  
       
+
+
 
 def Limpiar():
     if myNotebook.select():
