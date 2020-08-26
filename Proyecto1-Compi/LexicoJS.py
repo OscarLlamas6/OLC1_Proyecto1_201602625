@@ -15,6 +15,11 @@ class LexicoJS:
         self.errorLex = False
         self.repetir = False
         self.anular = False
+        self.EncontroID = False
+        self.EncontroNumero = False
+        self.EncontroCadena = False
+        self.EncontroUnilinea = False
+        self.EncontroMultilinea = False
         self.col = 0
         self.fila = 0
         self.cTokens = 0
@@ -157,6 +162,7 @@ class LexicoJS:
                         self.estado = 1
                         self.lexemaact+=c
                     else:
+                        self.EncontroID = True
                         if self.lexemaact == "var":
                             self.cTokens+=1
                             self.Reservadas.append(self.lexemaact)
@@ -272,6 +278,7 @@ class LexicoJS:
                         self.estado = 3
                         self.lexemaact += c
                     else:
+                        self.EncontroNumero = True
                         self.cTokens+=1
                         self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_NUMERO",self.lexemaact,"Valor numérico"))
                         self.lexemaact = ""
@@ -293,6 +300,7 @@ class LexicoJS:
                         self.estado = 4
                         self.lexemaact += c
                     else:
+                        self.EncontroNumero = True
                         self.cTokens+=1
                         self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_NUMERO",self.lexemaact,"Valor numérico"))
                         self.lexemaact = ""
@@ -302,18 +310,18 @@ class LexicoJS:
                     if c.isdigit():
                         self.estado = 2
                         self.lexemaact +=c
-                    else:
+                    else:    
                         if self.lexemaact == "+":
                             self.cTokens+=1
                             self.Operadores.append(self.lexemaact)
-                            self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_SUMA",self.lexemaact,"Valor numérico"))
+                            self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_SUMA",self.lexemaact,"Operador"))
                             self.lexemaact = ""
                             self.estado = 0
                             self.repetir = True
                         elif self.lexemaact == "-":
                             self.cTokens+=1
                             self.Operadores.append(self.lexemaact)
-                            self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_RESTA",self.lexemaact,"Valor numérico"))
+                            self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_RESTA",self.lexemaact,"Operador"))
                             self.lexemaact = ""
                             self.estado = 0
                             self.repetir = True
@@ -334,7 +342,8 @@ class LexicoJS:
                     if c != "\n":
                         self.estado = 7
                         self.lexemaact += c
-                    else:  
+                    else: 
+                        self.EncontroUnilinea = True 
                         self.lexemaact+=c                     
                         self.cTokens+=1
                         self.Comentarios.append(self.lexemaact)
@@ -358,6 +367,7 @@ class LexicoJS:
                         self.estado = 8
                         self.lexemaact += c
                     else:
+                        self.EncontroMultilinea = True
                         self.lexemaact += c
                         self.cTokens+=1
                         self.Comentarios.append(self.lexemaact)
@@ -369,6 +379,7 @@ class LexicoJS:
                         self.estado = 10
                         self.lexemaact += c
                     else:
+                        self.EncontroCadena = True
                         self.lexemaact += c
                         self.cTokens+=1
                         self.Cadenas.append(self.lexemaact)
@@ -380,6 +391,7 @@ class LexicoJS:
                         self.estado = 11
                         self.lexemaact += c
                     else:
+                        self.EncontroCadena = True
                         self.lexemaact += c
                         self.cTokens+=1
                         self.Cadenas.append(self.lexemaact)

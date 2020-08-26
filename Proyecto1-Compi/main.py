@@ -5,10 +5,12 @@ import pathlib
 import LexicoCSS
 import LexicoJS
 import LexicoHTML
+import principal
 import os
 from LexicoJS import *
 from LexicoCSS import *
 from LexicoHTML import *
+from principal import * 
 
 raiz=Tk()
 raiz.title("Compiladores 1")
@@ -148,6 +150,15 @@ def Analizar():
             #generarpdf de errores   
         else:
             print("Analisis lexico exitoso")
+            if a.EncontroID:
+                ER1 = "..L*||DLG"
+                p1= principal(ER1,"EstadosID.gv")
+                messagebox.showinfo(title="Proyecto 1: OLC1", message="Automata ID's y palabras reservadas generado. Presione Aceptar para continuar.")
+            if a.EncontroNumero:
+                ER2 = "....||MmεD*D|..PD*Dε"
+                p2 = principal(ER2,"EstadosNum.gv")
+                messagebox.showinfo(title="Proyecto 1: OLC1", message="Automata Números generado. Presione Aceptar para continuar.")
+            
             #generar arbol
 
     elif lenguaje.lower() == ".css":
