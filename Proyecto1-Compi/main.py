@@ -5,12 +5,12 @@ import pathlib
 import LexicoCSS
 import LexicoJS
 import LexicoHTML
-import principal
+import Reportes
 import os
 from LexicoJS import *
 from LexicoCSS import *
 from LexicoHTML import *
-from principal import * 
+from Reportes import *
 
 raiz=Tk()
 raiz.title("Compiladores 1")
@@ -39,33 +39,49 @@ def GenerarSalida(Tokens, path):
     f.close()
 
 def GenerarPDFErrores(Errores):
-    f= open("C:\Salida\Errores.html","w+")
+    f= open("C:\\Salida\\Errores.html","w+")
     f.write("""<!DOCTYPE html>
-<html>
-<body>
-<h1>REPORTE DE ERRORES</h1>
+    <html>
+    <body>
+    <h1>REPORTE DE ERRORES</h1>
 
-<table style="width:100%" border=1>
- <tr>
-    <th>No.</th>
-    <th>Fila</th> 
-    <th>Columna</th>
-    <th>Descripción</th>
-  </tr>""")
+    <table style="width:100%" border=1>
+    <tr>
+        <th>No.</th>
+        <th>Fila</th> 
+        <th>Columna</th>
+        <th>Descripción</th>
+    </tr>""")
     for e in Errores:
         f.write(""" <tr>
     <th>{}</th>
     <th>{}</th> 
     <th>{}</th>
     <th>El caracter '{}' no pertence al lenguaje</th>
-  </tr>""".format(e.numero,e.fila,e.columna,e.error))
+    </tr>""".format(e.numero,e.fila,e.columna,e.error))
     f.write("""</table>
     
-</body>
-</html>
-""")      
+    </body>
+    </html>
+    """)      
     f.close()
+    os.startfile("C:\\Salida\\Errores.html",'open')
 
+def PintarIDs(ids):
+    idt = 0
+    if myNotebook.select():
+        idt = myNotebook.index('current')
+    mytexts[idt].tag_remove('found4', '1.0', END)
+    for word in ids:
+        idx = '1.0'
+        while idx:
+            idx = mytexts[idt].search(word, idx, nocase=1, stopindex=END)
+            if idx:
+                lastidx = '%s+%dc' % (idx, len(word))
+                mytexts[idt].tag_add('found4', idx, lastidx)
+                idx = lastidx
+
+    mytexts[idt].tag_config('found4', foreground='black')
 
 def PintarReservadas(reservadas):
     idt = 0
@@ -115,7 +131,6 @@ def PintarComentarios(comentarios):
 
     mytexts[idt].tag_config('found2', foreground='gray40')
 
-
 def PintarOperadores(Operadores):
     idt = 0
     if myNotebook.select():
@@ -137,6 +152,9 @@ def Analizar():
     if myNotebook.select():
         idx = myNotebook.index('current')
     if lenguaje.lower() == ".js":
+        textoConsola.config(state="normal")
+        textoConsola.delete(1.0, END)
+        textoConsola.config(state="disabled")
         a = LexicoJS(mytexts[idx].get("2.0",'end-1c'), mytexts[idx].get('1.0', '1.0 lineend'))
         a.Iniciar()
         GenerarSalida(a.Tokens, a.PathLine)
@@ -149,28 +167,69 @@ def Analizar():
             GenerarPDFErrores(a.Errores)  
             #generarpdf de errores   
         else:
-            print("Analisis lexico exitoso")
+            print("Analisis lexico exitoso")       
             if a.EncontroID:
-                ER1 = "..L*||DLG"
-                p1= principal(ER1,"EstadosID.gv")
-                messagebox.showinfo(title="Proyecto 1: OLC1", message="Automata ID's y palabras reservadas generado. Presione Aceptar para continuar.")
+                Reportes.AutomataID()
+            if a.EncontroCadena:
+                Reportes.AutomataCadena()
+            if a.EncontroMultilinea:
+                Reportes.AutomataComentarioml()
             if a.EncontroNumero:
-                ER2 = "....||MmεD*D|..PD*Dε"
-                p2 = principal(ER2,"EstadosNum.gv")
-                messagebox.showinfo(title="Proyecto 1: OLC1", message="Automata Números generado. Presione Aceptar para continuar.")
-            
+                Reportes.AutomataNumero()
             #generar arbol
 
     elif lenguaje.lower() == ".css":
-        a = LexicoCSS(mytexts[idx].get("1.0",'end-1c'))
+        textoConsola.config(state="normal")
+        textoConsola.delete(1.0, END)
+        textoConsola.config(state="disabled")
+        a = LexicoCSS(mytexts[idx].get("2.0",'end-1c'), mytexts[idx].get('1.0', '1.0 lineend'))
         a.Iniciar()
+        GenerarSalida(a.Tokens, a.PathLine)
+        PintarReservadas(a.Reservadas)
+        PintarCadenas(a.Cadenas)
+        PintarComentarios(a.Comentarios)
+        PintarOperadores(a.Operadores)
+        PintarIDs(a.IDs)
+        if a.errorLex:
+            print("Error lexico encontrado")   
+            GenerarPDFErrores(a.Errores)
+            for er in a.Errores:
+                textoConsola.config(state="normal")
+                textoConsola.insert(INSERT, "{}. Fila = {}   Col. = {}   Error = \'{}\' no pertenece al lenguaje.\n".format(er.numero, er.fila, er.columna, er.error))
+                textoConsola.config(state="disabled")
+            #generarpdf de errores   
+        else:
+            textoConsola.config(state="normal")
+            textoConsola.insert(INSERT, "Analisis léxico exitoso!\n\n")
+            textoConsola.config(state="disabled")
+            if a.EncontroID:
+                textoConsola.config(state="normal")
+                textoConsola.insert(INSERT, "ID: Estado 0 -> Estado 1 (Estado Aceptación)\n")
+                textoConsola.config(state="disabled") 
+            if a.EncontroCadena:
+                textoConsola.config(state="normal")
+                textoConsola.insert(INSERT, "Cadena: Estado 0 -> Estado 10 (Estado Aceptación)\n")
+                textoConsola.config(state="disabled")                 
+            if a.EncontroMultilinea:
+                textoConsola.config(state="normal")
+                textoConsola.insert(INSERT, "Multilinea: Estado 0 -> Estado 6 -> Estado 8 - Estado 9(Estado Aceptación)\n")
+                textoConsola.config(state="disabled")                  
+            if a.EncontroNumero:
+                textoConsola.config(state="normal")
+                textoConsola.insert(INSERT, "Número: Estado 0 -> Estado 2 (Estado Aceptación)\n")
+                textoConsola.config(state="disabled")
+            textoConsola.config(state="normal")
+            textoConsola.insert(INSERT, "\n")
+            textoConsola.config(state="disabled")
+            for tk in a.Tokens:
+                if tk.token != "TK_ESPACIO":
+                    textoConsola.config(state="normal")
+                    textoConsola.insert(INSERT, "{}. Fila = {}   Col. = {}   Lexema = {}   Tipo = {}\n".format(tk.numero, tk.fila, tk.columna, tk.lexema, tk.tipo))
+                    textoConsola.config(state="disabled")                                 
     elif lenguaje.lower() == ".html":
         a = LexicoHTML(mytexts[idx].get("1.0",'end-1c'))
         a.Iniciar()  
       
-
-
-
 def Limpiar():
     if myNotebook.select():
         idx = myNotebook.index('current')
@@ -303,8 +362,14 @@ for i in range(4):
     myscrolls[i].place(in_=mytexts[i], relx=1, rely=0, relheight=1, anchor='ne', border="outside")
     mytexts[i].configure(yscrollcommand=myscrolls[i].set)
 
-
-
-
+    frameConsola = Frame(raiz, width=985, height=200, bg='blue')
+    frameConsola.place(x=5,y=690)
+    textoConsola = Text(frameConsola,width=76, height=7)
+    textoConsola.config(fg="OliveDrab1", font=myFont, bg="black", state="disabled")
+    textoConsola.pack()
+    scrollConsola = Scrollbar(frameConsola, command=textoConsola.yview)
+    scrollConsola.pack(side=RIGHT, fill=Y)
+    scrollConsola.place(in_=textoConsola, relx=1, rely=0, relheight=1, anchor='ne', border="outside")
+    textoConsola.configure(yscrollcommand=scrollConsola.set)
 
 mainloop()
