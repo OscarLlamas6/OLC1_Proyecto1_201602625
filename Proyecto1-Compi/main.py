@@ -5,11 +5,13 @@ import pathlib
 import LexicoCSS
 import LexicoJS
 import LexicoHTML
+import LexicoRMT
 import Reportes
 import os
 from LexicoJS import *
 from LexicoCSS import *
 from LexicoHTML import *
+from LexicoRMT import *
 from Reportes import *
 
 raiz=Tk()
@@ -155,13 +157,14 @@ def Analizar():
         textoConsola.config(state="normal")
         textoConsola.delete(1.0, END)
         textoConsola.config(state="disabled")
-        a = LexicoJS(mytexts[idx].get("2.0",'end-1c'), mytexts[idx].get('1.0', '1.0 lineend'))
+        a = LexicoJS(mytexts[idx].get("1.0",'end-1c'))
         a.Iniciar()
         GenerarSalida(a.Tokens, a.PathLine)
         PintarReservadas(a.Reservadas)
         PintarCadenas(a.Cadenas)
-        PintarComentarios(a.Comentarios)
         PintarOperadores(a.Operadores)
+        PintarComentarios(a.Comentarios)
+        
         if a.errorLex:
             print("Error lexico encontrado")   
             GenerarPDFErrores(a.Errores)  
@@ -182,7 +185,7 @@ def Analizar():
         textoConsola.config(state="normal")
         textoConsola.delete(1.0, END)
         textoConsola.config(state="disabled")
-        a = LexicoCSS(mytexts[idx].get("2.0",'end-1c'), mytexts[idx].get('1.0', '1.0 lineend'))
+        a = LexicoCSS(mytexts[idx].get("1.0",'end-1c'))
         a.Iniciar()
         GenerarSalida(a.Tokens, a.PathLine)
         PintarReservadas(a.Reservadas)
@@ -227,8 +230,24 @@ def Analizar():
                     textoConsola.insert(INSERT, "{}. Fila = {}   Col. = {}   Lexema = {}   Tipo = {}\n".format(tk.numero, tk.fila, tk.columna, tk.lexema, tk.tipo))
                     textoConsola.config(state="disabled")                                 
     elif lenguaje.lower() == ".html":
-        a = LexicoHTML(mytexts[idx].get("1.0",'end-1c'))
-        a.Iniciar()  
+        a = LexicoHTML(mytexts[idx].get("0.0",'end-1c'))
+        a.Iniciar()
+    elif lenguaje.lower() == ".rmt":
+        textoConsola.config(state="normal")
+        textoConsola.delete(1.0, END)
+        textoConsola.config(state="disabled")
+        a = LexicoRMT(mytexts[idx].get("0.0",'end-1c'))
+        a.Iniciar()    
+        if a.errorLex:
+            textoConsola.config(state="normal")
+            textoConsola.insert(INSERT, "ERROR LEXICO ENCONTRADO\n")
+            textoConsola.config(state="disabled")  
+        else:
+            textoConsola.config(state="normal")
+            textoConsola.insert(INSERT, "ANALISIS LEXICO EXITOSO\n")
+            textoConsola.config(state="disabled")  
+          
+    
       
 def Limpiar():
     if myNotebook.select():
@@ -275,7 +294,7 @@ def abrir():
     idx = 0
     if myNotebook.select():
         idx = myNotebook.index('current')
-    archivo = filedialog.askopenfilename(title = "Abrir Archivo", filetypes = (("JavaScript files","*.js"),("CSS files","*.css"),("HTML files","*.html")))
+    archivo = filedialog.askopenfilename(title = "Abrir Archivo", filetypes = (("JavaScript files","*.js"),("CSS files","*.css"),("HTML files","*.html"),("RMT files","*.rmt")))
     if archivo != '':
         lenguaje = pathlib.Path(archivo).suffix
         entrada = open(archivo, encoding="utf-8")

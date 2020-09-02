@@ -9,7 +9,7 @@ from Error import *
 
 
 class LexicoJS:
-    def __init__(self, entrada, pathline):
+    def __init__(self, entrada):
         self.entrada = entrada
         self.estado = 0
         self.errorLex = False
@@ -32,7 +32,8 @@ class LexicoJS:
         self.Operadores = []
         self.Comentarios = []
         self.Path = ""
-        self.PathLine = pathline[10:]
+        self.PathLine = '''C:\Salida\\'''
+        #self.PathLine = "pathline[10:]"
 
 
 
@@ -49,7 +50,7 @@ class LexicoJS:
             while self.repetir:
                 self.repetir = False
                 if self.estado == 0:
-                    if c.isspace():
+                    if c.isspace() or c == '    ':
                         if c == "\n":
                             self.col = 0
                             self.fila+=1
@@ -105,6 +106,11 @@ class LexicoJS:
                         self.cTokens+=1
                         self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_COMA",self.lexemaact,"Simbolo"))
                         self.lexemaact = ""
+                    elif c == ":":
+                        self.lexemaact+=c
+                        self.cTokens+=1
+                        self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_DOSPUNTOS",self.lexemaact,"Simbolo"))
+                        self.lexemaact = ""
                     elif c == "(":
                         self.lexemaact+=c
                         self.cTokens+=1
@@ -122,17 +128,11 @@ class LexicoJS:
                         self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_NEGACION",self.lexemaact,"Simbolo"))
                         self.lexemaact = ""
                     elif c == "&":
-                        self.lexemaact+=c
-                        self.cTokens+=1
-                        self.Operadores.append(self.lexemaact)
-                        self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_AMPERSAND",self.lexemaact,"Simbolo"))
-                        self.lexemaact = ""
+                        self.estado = 12
+                        self.lexemaact = c                        
                     elif c == "|":
-                        self.lexemaact+=c
-                        self.cTokens+=1
-                        self.Operadores.append(self.lexemaact)
-                        self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_PLECA",self.lexemaact,"Simbolo"))
-                        self.lexemaact = ""
+                        self.estado = 13
+                        self.lexemaact = c
                     elif c.isalpha() or c == "_": #letra
                         self.estado = 1
                         self.lexemaact = c
@@ -222,6 +222,16 @@ class LexicoJS:
                             self.cTokens+=1
                             self.Reservadas.append(self.lexemaact)
                             self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_CLASS",self.lexemaact,"Palabra reservada"))
+                            self.lexemaact = ""
+                        elif self.lexemaact == "null":
+                            self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
+                            self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_NUL",self.lexemaact,"Palabra reservada"))
+                            self.lexemaact = ""
+                        elif self.lexemaact == "new":
+                            self.cTokens+=1
+                            self.Reservadas.append(self.lexemaact)
+                            self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_NEW",self.lexemaact,"Palabra reservada"))
                             self.lexemaact = ""
                         elif self.lexemaact == "this":
                             self.cTokens+=1
@@ -398,8 +408,36 @@ class LexicoJS:
                         self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_CADENA",self.lexemaact,"Cadena"))
                         self.lexemaact = ""
                         self.estado = 0
-                    
-                    
+                elif self.estado == 12:
+                    if c == "&":
+                        self.lexemaact+=c
+                        self.cTokens+=1
+                        self.Operadores.append(self.lexemaact)
+                        self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_&&",self.lexemaact,"Operador"))
+                        self.lexemaact = ""
+                        self.estado = 0
+                    else:                           
+                        self.cErrores+=1
+                        self.Errores.append(Error(self.cErrores, self.fila, self.col, self.lexemaact, "Léxico", "Elemento léxico desconocido"))
+                        self.lexemaact = ""
+                        self.errorLex = True
+                        self.estado = 0
+                        self.repetir = True
+                elif self.estado == 13:
+                    if c == "|":
+                        self.lexemaact+=c
+                        self.cTokens+=1
+                        self.Operadores.append(self.lexemaact)
+                        self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_||",self.lexemaact,"Operador"))
+                        self.lexemaact = ""
+                        self.estado = 0
+                    else:                           
+                        self.cErrores+=1
+                        self.Errores.append(Error(self.cErrores, self.fila, self.col, self.lexemaact, "Léxico", "Elemento léxico desconocido"))
+                        self.lexemaact = ""
+                        self.errorLex = True
+                        self.estado = 0
+                        self.repetir = True
                  
                 
                 

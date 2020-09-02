@@ -6,7 +6,7 @@ from Error import *
 
 
 class LexicoCSS:
-    def __init__(self, entrada, pathline):
+    def __init__(self, entrada):
         self.entrada = entrada
         self.estado = 0
         self.errorLex = False
@@ -30,7 +30,8 @@ class LexicoCSS:
         self.Comentarios = []
         self.IDs = []
         self.Path = ""
-        self.PathLine = pathline[10:]
+        self.PathLine = '''C:\Salida\\'''
+        #self.PathLine = pathline[10:]
         
     def Iniciar(self):
         print("Analizador CSS!")
