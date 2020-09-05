@@ -41,7 +41,7 @@ def GenerarSalida(Tokens, path):
     f.close()
 
 def GenerarPDFErrores(Errores):
-    f= open("C:\\Salida\\Errores.html","w+")
+    f= open("C:\\output\\Errores.html","w+")
     f.write("""<!DOCTYPE html>
     <html>
     <body>
@@ -67,7 +67,7 @@ def GenerarPDFErrores(Errores):
     </html>
     """)      
     f.close()
-    os.startfile("C:\\Salida\\Errores.html",'open')
+    os.startfile("C:\\output\\Errores.html",'open')
 
 def PintarIDs(ids):
     idt = 0
@@ -75,7 +75,7 @@ def PintarIDs(ids):
         idt = myNotebook.index('current')
     mytexts[idt].tag_remove('found4', '1.0', END)
     for word in ids:
-        idx = '1.0'
+        idx = '3.0'
         while idx:
             idx = mytexts[idt].search(word, idx, nocase=1, stopindex=END)
             if idx:
@@ -91,7 +91,7 @@ def PintarReservadas(reservadas):
         idt = myNotebook.index('current')
     mytexts[idt].tag_remove('found1', '1.0', END)
     for word in reservadas:
-        idx = '1.0'
+        idx = '3.0'
         while idx:
             idx = mytexts[idt].search(word, idx, nocase=1, stopindex=END)
             if idx:
@@ -107,7 +107,7 @@ def PintarCadenas(cadenas):
         idt = myNotebook.index('current')
     mytexts[idt].tag_remove('found', '1.0', END)
     for word in cadenas:
-        idx = '1.0'
+        idx = '3.0'
         while idx:
             idx = mytexts[idt].search(word, idx, nocase=1, stopindex=END)
             if idx:
@@ -139,7 +139,7 @@ def PintarOperadores(Operadores):
         idt = myNotebook.index('current')
     mytexts[idt].tag_remove('found3', '1.0', END)
     for word in Operadores:
-        idx = '1.0'
+        idx = '3.0'
         while idx:
             idx = mytexts[idt].search(word, idx, nocase=1, stopindex=END)
             if idx:
@@ -149,6 +149,22 @@ def PintarOperadores(Operadores):
 
     mytexts[idt].tag_config('found3', foreground='orange')
 
+def PintarTextos(Textos):
+    idt = 0
+    if myNotebook.select():
+        idt = myNotebook.index('current')
+    mytexts[idt].tag_remove('found8', '1.0', END)
+    for word in Textos:
+        idx = '3.0'
+        while idx:
+            idx = mytexts[idt].search(word, idx, nocase=1, stopindex=END)
+            if idx:
+                lastidx = '%s+%dc' % (idx, len(word))
+                mytexts[idt].tag_add('found8', idx, lastidx)
+                idx = lastidx
+
+    mytexts[idt].tag_config('found8', foreground='black')
+
 def Analizar():
     idx = 0
     if myNotebook.select():
@@ -157,7 +173,7 @@ def Analizar():
         textoConsola.config(state="normal")
         textoConsola.delete(1.0, END)
         textoConsola.config(state="disabled")
-        a = LexicoJS(mytexts[idx].get("1.0",'end-1c'))
+        a = LexicoJS(mytexts[idx].get("3.0",'end-1c'), mytexts[idx].get('1.0', '1.0 lineend'))
         a.Iniciar()
         GenerarSalida(a.Tokens, a.PathLine)
         PintarReservadas(a.Reservadas)
@@ -185,7 +201,7 @@ def Analizar():
         textoConsola.config(state="normal")
         textoConsola.delete(1.0, END)
         textoConsola.config(state="disabled")
-        a = LexicoCSS(mytexts[idx].get("1.0",'end-1c'))
+        a = LexicoCSS(mytexts[idx].get("3.0",'end-1c'), mytexts[idx].get('1.0', '1.0 lineend'))
         a.Iniciar()
         GenerarSalida(a.Tokens, a.PathLine)
         PintarReservadas(a.Reservadas)
@@ -230,8 +246,28 @@ def Analizar():
                     textoConsola.insert(INSERT, "{}. Fila = {}   Col. = {}   Lexema = {}   Tipo = {}\n".format(tk.numero, tk.fila, tk.columna, tk.lexema, tk.tipo))
                     textoConsola.config(state="disabled")                                 
     elif lenguaje.lower() == ".html":
-        a = LexicoHTML(mytexts[idx].get("0.0",'end-1c'))
+        textoConsola.config(state="normal")
+        textoConsola.delete(1.0, END)
+        textoConsola.config(state="disabled")
+        a = LexicoHTML(mytexts[idx].get("3.0",'end-1c'), mytexts[idx].get('1.0', '1.0 lineend'))
         a.Iniciar()
+        GenerarSalida(a.Tokens, a.PathLine)
+        PintarReservadas(a.Reservadas)
+        PintarCadenas(a.Cadenas)
+        PintarOperadores(a.Operadores)
+        PintarTextos(a.Textos)
+        if a.errorLex:
+            print("Error lexico encontrado")   
+            GenerarPDFErrores(a.Errores)
+            for er in a.Errores:
+                textoConsola.config(state="normal")
+                textoConsola.insert(INSERT, "{}. Fila = {}   Col. = {}   Error = \'{}\' no pertenece al lenguaje.\n".format(er.numero, er.fila, er.columna, er.error))
+                textoConsola.config(state="disabled")
+            #generarpdf de errores
+        else:
+            textoConsola.config(state="normal")
+            textoConsola.insert(INSERT, "Analisis léxico exitoso!\n\n")
+            textoConsola.config(state="disabled") 
     elif lenguaje.lower() == ".rmt":
         textoConsola.config(state="normal")
         textoConsola.delete(1.0, END)
@@ -246,8 +282,6 @@ def Analizar():
             textoConsola.config(state="normal")
             textoConsola.insert(INSERT, "ANALISIS LEXICO EXITOSO\n")
             textoConsola.config(state="disabled")  
-          
-    
       
 def Limpiar():
     if myNotebook.select():

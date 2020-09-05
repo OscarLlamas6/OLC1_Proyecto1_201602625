@@ -3,13 +3,14 @@ import Token
 from Token import *
 import Error
 from Error import *
+import pathlib
 
 
 
 
 
 class LexicoJS:
-    def __init__(self, entrada):
+    def __init__(self, entrada, pathline):
         self.entrada = entrada
         self.estado = 0
         self.errorLex = False
@@ -32,8 +33,11 @@ class LexicoJS:
         self.Operadores = []
         self.Comentarios = []
         self.Path = ""
-        self.PathLine = '''C:\Salida\\'''
-        #self.PathLine = "pathline[10:]"
+        self.PathLine = "C:" + pathline[9:]
+        termina = self.PathLine.endswith('\\')
+        if not termina:
+            self.PathLine += "\\"
+        pathlib.Path(self.PathLine).mkdir(parents=True, exist_ok=True)
 
 
 
@@ -42,7 +46,7 @@ class LexicoJS:
         self.Tokens[:]=[]
         self.errorLex = False
         self.entrada += " \n"   
-        self.fila+=2     
+        self.fila+=3     
         for c in self.entrada: # iteramos en cada caracter           
             self.col+=1        
             self.anular = False
