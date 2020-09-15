@@ -5,13 +5,13 @@ import pathlib
 import LexicoCSS
 import LexicoJS
 import LexicoHTML
-import LexicoRMT
+import RMT
 import Reportes
 import os
 from LexicoJS import *
 from LexicoCSS import *
 from LexicoHTML import *
-from LexicoRMT import *
+from RMT import *
 from Reportes import *
 
 raiz=Tk()
@@ -272,16 +272,19 @@ def Analizar():
         textoConsola.config(state="normal")
         textoConsola.delete(1.0, END)
         textoConsola.config(state="disabled")
-        a = LexicoRMT(mytexts[idx].get("0.0",'end-1c'))
-        a.Iniciar()    
-        if a.errorLex:
+        a = RMT(mytexts[idx].get("0.0",'end-1c'))   
+        if a.error:
             textoConsola.config(state="normal")
-            textoConsola.insert(INSERT, "ERROR LEXICO ENCONTRADO\n")
+            textoConsola.insert(INSERT, "Incorrecto\n")
             textoConsola.config(state="disabled")  
         else:
             textoConsola.config(state="normal")
-            textoConsola.insert(INSERT, "ANALISIS LEXICO EXITOSO\n")
-            textoConsola.config(state="disabled")  
+            textoConsola.insert(INSERT, "Correcto\n")
+            textoConsola.config(state="disabled")
+                
+            
+            
+ 
       
 def Limpiar():
     if myNotebook.select():
