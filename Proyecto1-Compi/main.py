@@ -5,13 +5,15 @@ import pathlib
 import LexicoCSS
 import LexicoJS
 import LexicoHTML
-import RMT
+import LexicoRMT
+import SintacticoRMT
 import Reportes
 import os
 from LexicoJS import *
 from LexicoCSS import *
 from LexicoHTML import *
-from RMT import *
+from LexicoRMT import *
+from SintacticoRMT import *
 from Reportes import *
 
 raiz=Tk()
@@ -44,10 +46,10 @@ def GenerarPDFErrores(Errores):
     f= open("C:\\output\\Errores.html","w+")
     f.write("""<!DOCTYPE html>
     <html>
-    <body>
+    <body><center>
     <h1>REPORTE DE ERRORES</h1>
 
-    <table style="width:100%" border=1>
+    <table border=1>
     <tr>
         <th>No.</th>
         <th>Fila</th> 
@@ -62,13 +64,40 @@ def GenerarPDFErrores(Errores):
     <th>El caracter '{}' no pertence al lenguaje</th>
     </tr>""".format(e.numero,e.fila,e.columna,e.error))
     f.write("""</table>
-    
+    </center>
     </body>
     </html>
     """)      
     f.close()
     os.startfile("C:\\output\\Errores.html",'open')
+#END
+def GenerarPDFResultados(Operaciones):
+    f= open("C:\\output\\ResultadosRMT.html","w+")
+    f.write("""<!DOCTYPE html>
+    <html>
+    <body><center>
+    <h1>REPORTE DE RESULTADOS</h1>
 
+    <table border=1>
+    <tr>
+        <th>No.</th>
+        <th>Operacion</th> 
+        <th>Resultado</th>
+    </tr>""")
+    for o in Operaciones:
+        f.write(""" <tr>
+    <th>{}</th>
+    <th>{}</th> 
+    <th>{}</th>
+    </tr>""".format(o.numero,o.oper,o.resultado))
+    f.write("""</table>
+    </center>
+    </body>
+    </html>
+    """)      
+    f.close()
+    os.startfile("C:\\output\\ResultadosRMT.html",'open')
+#END
 def PintarIDs(ids):
     idt = 0
     if myNotebook.select():
@@ -196,7 +225,6 @@ def Analizar():
             if a.EncontroNumero:
                 Reportes.AutomataNumero()
             #generar arbol
-
     elif lenguaje.lower() == ".css":
         textoConsola.config(state="normal")
         textoConsola.delete(1.0, END)
@@ -272,19 +300,10 @@ def Analizar():
         textoConsola.config(state="normal")
         textoConsola.delete(1.0, END)
         textoConsola.config(state="disabled")
-        a = RMT(mytexts[idx].get("0.0",'end-1c'))   
-        if a.error:
-            textoConsola.config(state="normal")
-            textoConsola.insert(INSERT, "Incorrecto\n")
-            textoConsola.config(state="disabled")  
-        else:
-            textoConsola.config(state="normal")
-            textoConsola.insert(INSERT, "Correcto\n")
-            textoConsola.config(state="disabled")
-                
-            
-            
- 
+        a = LexicoRMT(mytexts[idx].get("0.0",'end-1c'))
+        a.Iniciar()
+        GenerarPDFResultados(a.Operaciones)   
+
       
 def Limpiar():
     if myNotebook.select():

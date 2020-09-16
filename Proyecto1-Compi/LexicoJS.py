@@ -442,7 +442,14 @@ class LexicoJS:
                         self.errorLex = True
                         self.estado = 0
                         self.repetir = True
-                 
+        if self.estado != 0:
+            self.cErrores+=1
+            self.Errores.append(Error(self.cErrores, self.fila, self.col, self.lexemaact, "Léxico", "Elemento léxico desconocido"))
+            self.lexemaact = ""
+            self.errorLex = True
+            self.estado = 0
+            self.repetir = True
+
                 
                 
 

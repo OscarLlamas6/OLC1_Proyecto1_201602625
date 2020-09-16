@@ -288,3 +288,10 @@ class LexicoHTML:
                         self.Tokens.append(Token(self.cTokens, self.fila, self.col,"TK_mQ",self.lexemaact,"Simbolo"))
                         self.lexemaact = ""
                         self.estado = 0
+        if self.estado != 0:
+            self.cErrores+=1
+            self.Errores.append(Error(self.cErrores, self.fila, self.col, self.lexemaact, "Léxico", "Elemento léxico desconocido"))
+            self.lexemaact = ""
+            self.errorLex = True
+            self.estado = 0
+            self.repetir = True
