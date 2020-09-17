@@ -212,7 +212,15 @@ def Analizar():
         
         if a.errorLex:
             print("Error lexico encontrado")   
-            GenerarPDFErrores(a.Errores)  
+            GenerarPDFErrores(a.Errores)
+            if a.EncontroID:
+                Reportes.AutomataID()
+            if a.EncontroCadena:
+                Reportes.AutomataCadena()
+            if a.EncontroMultilinea:
+                Reportes.AutomataComentarioml()
+            if a.EncontroNumero:
+                Reportes.AutomataNumero()
             #generarpdf de errores   
         else:
             print("Analisis lexico exitoso")       
